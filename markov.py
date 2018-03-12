@@ -1,5 +1,10 @@
 n = 0
 gamma = 0.9
+results = {};
+
+n = input("Please enter n:");
+gamma = input("Enter gamma:")
+state = input("Enter state(0 for unfit, 1 for fit):")
 
 exercise = [(0.99, 8) , (.01,8), (.2,0), (.8,0)]
 relax = [(0.7, 10) , (.3,10), (0,5), (1,5)]
@@ -80,42 +85,54 @@ def V(s,n):
     return max(qn(s,"exercise",n), qn(s,"relax",n))
 
 def qn(s,a,n):
-    if n == 0:
-        return q0(s,a)
-    temp = q0(s,a) + gamma * (p(s,a,"fit") * V("fit",n-1) + p(s, a, "unfit") * V("unfit", n-1))
+    if (s,a,n) in results:
+        temp = results[(s,a,n)]
+    else:
+        if n == 0:
+            return q0(s,a)
+        temp = q0(s,a) + gamma * (p(s,a,"fit") * V("fit",n-1) + p(s, a, "unfit") * V("unfit", n-1))
+        results[(s,a,n)] = temp
     return temp
 
-#print p("fit", "exercise", "unfit")
-#print r("fit", "exercise", "unfit")
-#print q0("fit","exercise")
-#print qn("fit","exercise",0)
+doprint = 0
 
-string = 'Fit, Exercise:    '
-for i in range(0,3):
-    if i == 2:
-        string = string + str(qn("fit","exercise",i)) + "\n"
-    else:
-        string = string + str(qn("fit","exercise",i)) + ', '
+#Prints all values up until n
+if doprint == 1:
+    string = 'Fit, Exercise:    '
+    for i in range(0,n):
+        if i == n-1:
+            string = string + str(qn("fit","exercise",i)) + "\n"
+        else:
+            string = string + str(qn("fit","exercise",i)) + ', '
 
-string = string + 'Fit, Relax:       '
-for i in range(0,3):
-    if i == 2:
-        string = string + str(qn("fit","relax",i)) + "\n"
-    else:
-        string = string + str(qn("fit","relax",i)) + ', '
+    string = string + 'Fit, Relax:       '
+    for i in range(0,n):
+        if i == n-1:
+            string = string + str(qn("fit","relax",i)) + "\n"
+        else:
+            string = string + str(qn("fit","relax",i)) + ', '
 
-string = string + 'Unfit, Exercise:  '
-for i in range(0,3):
-    if i == 2:
-        string = string + str(qn("unfit","exercise",i)) + "\n"
-    else:
-        string = string + str(qn("unfit","exercise",i)) + ', '
+    string = string + 'Unfit, Exercise:  '
+    for i in range(0,n):
+        if i == n-1:
+            string = string + str(qn("unfit","exercise",i)) + "\n"
+        else:
+            string = string + str(qn("unfit","exercise",i)) + ', '
 
-string = string + 'Unfit, Relax:     ' 
-for i in range(0,3):
-    if i == 2:
-        string = string + str(qn("unfit","relax",i)) + "\n"
-    else:
-        string = string + str(qn("unfit","relax",i)) + ', '
+    string = string + 'Unfit, Relax:     '
+    for i in range(0,n):
+        if i == n-1:
+            string = string + str(qn("unfit","relax",i)) + "\n"
+        else:
+            string = string + str(qn("unfit","relax",i)) + ', '
+    print string
 
-print string
+if state == 1:
+    print "Fit: "
+    print qn("fit","exercise", n)
+    print qn("fit","relax", n)
+
+if state == 0:
+    print "Unfit: "
+    print qn("unfit","exercise", n)
+    print qn("unfit","relax", n)
